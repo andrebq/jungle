@@ -8,17 +8,14 @@ import (
 )
 
 func TestLifecycle(t *testing.T) {
-	println("testing...")
 	localRoot := Root().Branch()
 	var count int32
 	localRoot.BranchFunc(func(branch Tree) error {
-		println("here")
 		<-branch.Pruned()
 		atomic.AddInt32(&count, 1)
 		return nil
 	})
 	localRoot.BranchFunc(func(branch Tree) error {
-		println("here 2")
 		<-branch.Pruned()
 		time.Sleep(time.Millisecond * 500)
 		atomic.AddInt32(&count, 1)
