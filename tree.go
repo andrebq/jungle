@@ -90,11 +90,10 @@ func (t *tree) BranchFunc(fn func(Tree) error) Tree {
 func (t *tree) lifecycle() {
 	branches := &subtrees{}
 	defer func() {
-		println("done with: ", t.pid)
 		close(t.done)
 	}()
 	var pruned bool
-	selfErr := make(chan error)
+	selfErr := make(chan error, 1)
 	popChildren := make(chan *tree)
 	waitSelfProc := make(chan Signal)
 
@@ -145,6 +144,11 @@ func (t *tree) lifecycle() {
 		// should add a timeout of some sort here
 		// but lets not worry about it for now
 		<-c.Done()
+	}
+
+	if t.process != nil {
+		// wait until our own process is completed
+		<-waitSelfProc
 	}
 	return
 }
